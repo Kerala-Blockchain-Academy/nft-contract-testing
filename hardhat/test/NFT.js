@@ -9,7 +9,7 @@ describe("NFT", function () {
   let nftContract;
 
   it("Should deploy the contract", async function () {
-    const [owner, otherAccount] = await ethers.getSigners();
+    const [owner] = await ethers.getSigners();
 
     const NFT = await ethers.getContractFactory("NFT");
     nftContract = await NFT.deploy();
@@ -26,11 +26,15 @@ describe("NFT", function () {
   });
 
   it("Should mint the NFT", async function () {
-    const mintTrx = await nftContract.MintNFT(
-      "0x3f5e3a0E8D2B8406bFbaa9B9559e21A3234530d0"
-    );
-
-    expect(mintTrx.blockNumber).to.be.above(1);
+    await expect(
+      nftContract.MintNFT("0x3f5e3a0E8D2B8406bFbaa9B9559e21A3234530d0")
+    )
+      .to.emit(nftContract, "Transfer")
+      .withArgs(
+        "0x0000000000000000000000000000000000000000",
+        "0x3f5e3a0E8D2B8406bFbaa9B9559e21A3234530d0",
+        1
+      );
   });
 
   it("Should fetch the NFT", async function () {
@@ -46,8 +50,9 @@ describe("NFT", function () {
   });
 
   it("Should update the URI", async function () {
-    const URITrx = await nftContract.changeTokenURI("revelations");
-    expect(URITrx.blockNumber).to.be.above(2);
+    await expect(nftContract.changeTokenURI("revelations"))
+      .to.emit(nftContract, "URIChanged")
+      .withArgs("revelations");
   });
 
   it("Should fetch the new URI", async function () {
