@@ -31,8 +31,14 @@ contract("NFT", function (accounts) {
     const mintTrx = await nftContract.MintNFT(
       "0x3f5e3a0E8D2B8406bFbaa9B9559e21A3234530d0"
     );
+    const mintEvent = mintTrx.logs[0];
 
-    assert.isAbove(mintTrx.receipt.blockNumber, 1);
+    assert.equal(mintEvent.event, "Transfer");
+    assert.equal(
+      mintEvent.args["1"],
+      "0x3f5e3a0E8D2B8406bFbaa9B9559e21A3234530d0"
+    );
+    assert.isAbove(mintEvent.args["2"].toNumber(), 0);
   });
 
   it("Should fetch the NFT", async function () {
@@ -49,8 +55,9 @@ contract("NFT", function (accounts) {
 
   it("Should update the URI", async function () {
     const URITrx = await nftContract.changeTokenURI("revelations");
+    const URIEvent = URITrx.logs[0];
 
-    assert.isAbove(URITrx.receipt.blockNumber, 2);
+    assert.equal(URIEvent.args["0"], "revelations");
   });
 
   it("Should fetch the new URI", async function () {
@@ -61,7 +68,7 @@ contract("NFT", function (accounts) {
 
   it("Should revert the transaction", async function () {
     try {
-      const URITrx = await nftContract.changeTokenURI("revelations", {
+      await nftContract.changeTokenURI("revelations", {
         from: accounts[1],
       });
     } catch (error) {
