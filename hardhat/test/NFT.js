@@ -14,7 +14,7 @@ describe("NFT", function () {
     const NFT = await ethers.getContractFactory("NFT");
     nftContract = await NFT.deploy();
 
-    expect(nftContract.deployTransaction.from).to.equal(owner.address);
+    expect(nftContract.runner.address).to.equal(owner.address);
   });
 
   it("Should fetch the name", async function () {
